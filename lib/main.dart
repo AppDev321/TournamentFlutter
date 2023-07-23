@@ -32,11 +32,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(360, 690),
-      builder: () => GetMaterialApp(
+      builder: (context,child) => GetMaterialApp(
         debugShowCheckedModeBanner: false,
         locale: const Locale('en', 'US'),
         fallbackLocale: const Locale('en', 'US'),
-        title: 'Getx Boilerplate',
+        title: 'Game Tournament',
         initialRoute: Routes.ONBOARD,
         theme: themeData,
         defaultTransition: Transition.fade,
