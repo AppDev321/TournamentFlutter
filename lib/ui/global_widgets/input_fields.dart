@@ -8,8 +8,9 @@ class EmailTextField extends StatelessWidget {
   final TextEditingController inputController;
   final String? hintText;
   final String? errorText;
-  const EmailTextField(
-      {Key? key, required this.inputController, this.hintText, this.errorText})
+  final bool isValidatorRequired;
+   const EmailTextField(
+      {Key? key, required this.inputController, this.hintText, this.errorText,this.isValidatorRequired = true})
       : super(key: key);
 
   @override
@@ -47,10 +48,15 @@ class EmailTextField extends StatelessWidget {
         ),
       ),
       validator: (val) {
-        if (!EmailValidator.validate(val!)) {
-          return 'Enter valid email';
+        if(isValidatorRequired==true) {
+          if (!EmailValidator.validate(val!)) {
+            return 'Enter valid email';
+          }
         }
-        return null;
+        else
+        {
+          return null;
+        }
       },
     );
   }
@@ -221,12 +227,13 @@ class PasswordInputField extends StatefulWidget {
   final TextEditingController textEditingController;
   final String? hintText;
   final String? errorText;
-
+ final bool isValidatorRequired;
   const PasswordInputField(
       {required this.textEditingController,
       Key? key,
       this.hintText,
-      this.errorText})
+      this.errorText,
+      this.isValidatorRequired =true})
       : super(key: key);
 
   @override
@@ -284,8 +291,10 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
         ),
       ),
       validator: (val) {
-        if (val!.length <= 5) {
-          return widget.errorText ?? 'Enter valid password';
+        if(widget.isValidatorRequired) {
+          if (val!.length <= 5) {
+            return widget.errorText ?? 'Enter valid password';
+          }
         }
         return null;
       },

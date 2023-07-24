@@ -1,5 +1,6 @@
 import 'package:base_project_getx/data/network/constants/endpoints.dart';
 import 'package:base_project_getx/data/network/interceptor/dio_interceptor.dart';
+import 'package:base_project_getx/data/network/response/result_handler.dart';
 import 'package:base_project_getx/utils/dio/dio_error_util.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -46,13 +47,13 @@ class DioClient {
         .catchError((errorMessage) {
       errorMessage = DioErrorUtil.handleError(errorMessage);
       debugPrint("ERROR in API RES : " + errorMessage);
-      throw errorMessage;
+      return errorMessage;
     });
     return response.data;
   }
 
   // Post:----------------------------------------------------------------------
-  Future<dynamic> post(
+  Future<ApiResponse> post(
     String uri, {
     data,
     Map<String, dynamic>? queryParameters,
@@ -70,12 +71,12 @@ class DioClient {
       cancelToken: cancelToken,
       onSendProgress: onSendProgress,
       onReceiveProgress: onReceiveProgress,
-    )
-        .catchError((e) {
+    ).catchError((e) {
       final errorMessage = DioErrorUtil.handleError(e);
       debugPrint("Error in DIO CLIENT: $errorMessage");
+      return ApiResponse.error(errorMessage);
     });
-    return response.data;
+    return ApiResponse.completed(response.data);
   }
 
   // Put:-----------------------------------------------------------------------

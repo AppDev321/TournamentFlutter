@@ -1,12 +1,20 @@
+import 'dart:math';
+
 import 'package:base_project_getx/data/encryption/mcrypt_base_64.dart';
+import 'package:base_project_getx/data/models/auth/login_reponse.dart';
 import 'package:base_project_getx/data/network/repository/auth_repository.dart';
 import 'package:base_project_getx/data/sharedpref/shared_preference_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../../data/network/response/api_status.dart';
+import '../../data/network/response/result_handler.dart';
+import '../../data/network/response/result_handler.dart';
+
 class AuthController extends GetxController {
   // ------------- Variables -------------
   final isLogged = false.obs;
+  final loginData = ApiResponse.loading().obs;
 
   // ----------------- Locators -----------------
   final sharedPrefHelper = Get.find<SharedPreferenceHelper>();
@@ -21,21 +29,22 @@ class AuthController extends GetxController {
 
   Future<void> login(String email, String password) async {
     // Encrypting password before sending to server to avoid sending plain text password to server
-    final encryptedPassword = MCryptBase64.encrypt(password);
+  //  final encryptedPassword = MCryptBase64.encrypt(password);
 
-    // Making login request to server with encrypted password and email
-    final loginResponse = await authRepository
-        .loginRequest(email, encryptedPassword)
-        .catchError((error) {
-      debugPrint("AuthController Login Error: $error");
-    });
-
-    // Checking if the login request was successful or not and saving the TOKEN in shared preferences and also updating the isLogged value in the UI
-    if (loginResponse.token != null) {
-      isLogged.value = true;
-      await sharedPrefHelper.saveAuthToken(loginResponse.token!);
-      await sharedPrefHelper.saveIsLoggedIn(isLogged.value);
+    loginData.value = ApiResponse.loading();
+    final loginResponse = await authRepository.loginRequest(email, password);
+    switch(loginResponse.status)
+    {
+      case Status.ERROR:
+        loginData.value = ApiResponse.error(loginResponse.message);
+        print("error msg print: ${loginResponse.message}");
+        break;
+      case Status.COMPLETED:
+        loginData.value = ApiResponse.completed(LoginResponse.fromJson(loginResponse.data));
+        print("success : ${loginResponse}");
+        break;
     }
+
   }
 
   Future<void> register(String email, String password) async {

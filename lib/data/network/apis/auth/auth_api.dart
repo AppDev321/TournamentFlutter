@@ -1,11 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:base_project_getx/data/models/auth/login_reponse.dart';
 import 'package:base_project_getx/data/models/auth/login_response_model.dart';
 import 'package:base_project_getx/data/models/auth/register_response_model.dart';
 import 'package:base_project_getx/data/network/constants/endpoints.dart';
 import 'package:base_project_getx/data/network/dio_client.dart';
+import 'package:base_project_getx/data/network/response/result_handler.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+
+import '../../exceptions/network_exceptions.dart';
 
 class AuthApi {
   // dio instance
@@ -14,24 +19,27 @@ class AuthApi {
   // injecting dio instance
   AuthApi(this._dioClient);
 
-  Future<LoginResponseModel> loginRequest(
-      {required String email, required String password}) async {
-    try {
-      final res = await _dioClient.post(
-        Endpoints.login,
-        options: Options(headers: {
-          'Content-Type': 'application/json',
-        }),
-        data:
-            jsonEncode(<String, String>{'email': email, 'password': password}),
-      );
-      return LoginResponseModel.fromJson(res);
-    } catch (e) {
-      debugPrint("Issue in login" "" + e.toString());
-      rethrow;
-    }
-  }
+  Future<dynamic> postRequest(
+      String endPoint,{required Map<String, dynamic> queryParams}) async {
+    final res = await _dioClient.post(
+      endPoint,
+      queryParameters: queryParams,
+    ).catchError((err){
+      print("error is here  == ${err.runtimeType}");
+    });
+   // print("response is here  == $res");
+return "";
+    /*  if(res is String) {
+        print("erero  == $res");
+        return ApiResponse.error(res);
+      }
+      else
+        {
+          return ApiResponse.completed(res);
+        }*/
 
+
+}
   Future<RegisterResponseModel> registerRequest(
       {required String email, required String password}) async {
     try {
@@ -40,14 +48,17 @@ class AuthApi {
         options: Options(headers: {
           'Content-Type': 'application/json',
         }),
-        data:
-            jsonEncode(<String, String>{'email': email, 'password': password}),
+        queryParameters: <String, String>{'username': email, 'password': password},
+        /*data:
+            jsonEncode(<String, String>{'email': email, 'password': password}),*/
       );
-      return RegisterResponseModel.fromJson(res);
+      return RegisterResponseModel.fromJson(res.data);
     } catch (e) {
       debugPrint(e.toString());
       rethrow;
     }
+
+
   }
 
   Future logoutRequest() async {

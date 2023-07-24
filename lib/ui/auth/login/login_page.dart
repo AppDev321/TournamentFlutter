@@ -31,16 +31,28 @@ class _LoginPageState extends State<LoginPage> {
       passwordVisible = !passwordVisible;
     });
   }
-
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _authController.loginData.listen((val) {
+      print("status =$val");
+    });
+  }
   void _loginRequested() async {
     if (_loginFormKey.currentState!.validate()) {
-      // await _authController
-      //     .login(emailController.text, passwordController.text)
-      //     .then((value) {
-      //   Get.offAllNamed(Routes.HOME);
-      // });
-      Get.offAllNamed(Routes.HOME);
+      /*await _authController
+          .login(emailController.text, passwordController.text)
+          .then((value) {
+        Get.offAllNamed(Routes.HOME);
+      });*/
+
     }
+
+
+    await _authController.login(emailController.text, passwordController.text);
+
+
   }
 
   @override
@@ -78,10 +90,12 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         EmailTextField(
                           inputController: emailController,
+                          isValidatorRequired: false,
                         ),
                         14.szh(),
                         PasswordInputField(
                           textEditingController: passwordController,
+                          isValidatorRequired: false,
                         )
                       ],
                     ),
